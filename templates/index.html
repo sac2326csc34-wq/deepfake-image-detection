@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deepfake Detection</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 420px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .upload-box {
+            border: 2px dashed #764ba2;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-box i {
+            font-size: 40px;
+            color: #764ba2;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .result {
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .real {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .fake {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .confidence {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .explanation {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        img {
+            margin-top: 15px;
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        footer {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1><i class="fa-solid fa-user-shield"></i> Deepfake Detector</h1>
+    <div class="subtitle">AI-powered image authenticity verification</div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="upload-box">
+            <i class="fa-solid fa-cloud-arrow-up"></i><br>
+            <input type="file" name="image" required>
+        </div>
+        <button type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i> Analyze Image
+        </button>
+    </form>
+
+    {% if result %}
+    <div class="result">
+        {% if result == "Real" %}
+            <span class="badge real"><i class="fa-solid fa-circle-check"></i> REAL IMAGE</span>
+        {% else %}
+            <span class="badge fake"><i class="fa-solid fa-triangle-exclamation"></i> FAKE IMAGE</span>
+        {% endif %}
+
+        <div class="confidence">
+            <strong>Confidence:</strong> {{ confidence }}%
+        </div>
+
+        <div class="explanation">
+            <strong>Explanation:</strong> {{ explanation }}
+        </div>
+
+        <img src="{{ image_url }}" alt="Uploaded Image">
+    </div>
+    {% endif %}
+
+    <footer>
+        <i class="fa-solid fa-brain"></i> Deep Learning | CNN | ResNet18
+    </footer>
+</div>
+
+</body>
+</html>
