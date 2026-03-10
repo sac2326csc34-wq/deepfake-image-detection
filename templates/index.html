@@ -1,168 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Deepfake Detection</title>
+<meta charset="UTF-8">
+<title>Deepfake AI Detector</title>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+/* Progress Bar */
+/* Progress Bar */
+.progress-bar{
+width:100%;
+height:18px;
+background:rgba(255,255,255,0.3);
+border-radius:20px;
+margin-top:10px;
+overflow:hidden;
+}
 
-        .container {
-            background: #ffffff;
-            width: 420px;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            text-align: center;
-        }
+.progress-fill{
+height:100%;
+width:0%;
+border-radius:20px;
+transition:width 1.5s ease-in-out;
+}
 
-        h1 {
-            margin-bottom: 10px;
-            color: #333;
-        }
+/* Blue for Real */
+.real-bar{
+background:#1100ff;
+box-shadow:0 0 10px #1100ff;
+}
 
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
+/* Red for Fake */
+.fake-bar{
+background:#ff2e63;
+box-shadow:0 0 10px #ff2e63;
+}
 
-        .upload-box {
-            border: 2px dashed #764ba2;
-            padding: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(-45deg,#4e73df,#1cc88a,#36b9cc,#f6c23e);
+background-size:400% 400%;
+animation:gradientBG 10s ease infinite;
+padding:40px 0;
+}
 
-        .upload-box i {
-            font-size: 40px;
-            color: #764ba2;
-        }
+@keyframes gradientBG{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
 
-        input[type="file"] {
-            margin-top: 10px;
-        }
+/* Loading Spinner */
+#loading{
+margin-top:25px;
+}
 
-        button {
-            margin-top: 15px;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 25px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.spinner{
+width:50px;
+height:50px;
+border:6px solid rgba(255,255,255,0.3);
+border-top:6px solid rgb(255, 255, 255);
+border-radius:50%;
+margin:0 auto;
+animation:spin 1s linear infinite;
+}
 
-        button:hover {
-            transform: scale(1.05);
-        }
+@keyframes spin{
+0%{ transform:rotate(0deg); }
+100%{ transform:rotate(360deg); }
+}
 
-        .result {
-            margin-top: 25px;
-            text-align: left;
-        }
+#loading p{
+margin-top:12px;
+font-weight:600;
+}
 
-        .badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
+.container{
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(18px);
+padding:50px;
+width:650px;
+border-radius:25px;
+box-shadow:0 25px 50px rgba(0,0,0,0.4);
+text-align:center;
+color:white;
+}
 
-        .real {
-            background: #d4edda;
-            color: #155724;
-        }
+h1{
+margin-bottom:30px;
+font-weight:700;
+font-size:28px;
+}
 
-        .fake {
-            background: #f8d7da;
-            color: #721c24;
-        }
+/* Normal File Input Styling */
+input[type="file"]{
+margin-top:10px;
+color:white;
+}
 
-        .confidence {
-            margin-top: 8px;
-            font-size: 14px;
-        }
+button{
+margin-top:25px;
+padding:14px 35px;
+border:none;
+border-radius:30px;
+background:white;
+color:#333;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+font-size:15px;
+}
 
-        .explanation {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #555;
-        }
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 15px white;
+}
 
-        img {
-            margin-top: 15px;
-            width: 100%;
-            border-radius: 12px;
-        }
+/* Preview */
+.preview img{
+margin-top:20px;
+max-width:300px;
+border-radius:15px;
+}
 
-        footer {
-            margin-top: 15px;
-            font-size: 12px;
-            color: #888;
-        }
-    </style>
+.upload-box{
+border:2px dashed rgba(255,255,255,0.8);
+border-radius:20px;
+padding:35px;
+margin-top:10px;
+transition:0.3s;
+}
+
+.upload-box:hover{
+background:rgba(255,255,255,0.15);
+box-shadow:0 0 15px white;
+}
+
+/* Result */
+.result{
+margin-top:30px;
+font-size:22px;
+font-weight:700;
+}
+
+.fake{
+color:#ff2e63;
+text-shadow:0 0 10px #ff2e63;
+}
+
+.real{
+color:#1100ff;
+text-shadow:0 0 10px #2f00ff;
+}
+
+.confidence{
+margin-top:8px;
+font-size:18px;
+font-weight:600;
+color:#fff;
+}
+
+/* Explanation */
+.explanation{
+margin-top:25px;
+background:rgba(0,0,0,0.25);
+padding:20px;
+border-radius:15px;
+color:#f1f1f1;
+font-size:14px;
+line-height:1.6;
+}
+
+/* Comparison */
+.comparison-container{
+margin-top:35px;
+display:flex;
+justify-content:space-between;
+gap:20px;
+}
+
+.image-box{
+width:48%;
+background:rgba(255,255,255,0.15);
+padding:15px;
+border-radius:15px;
+}
+
+/* Toggle Position */
+.theme-toggle{
+position:absolute;
+top:25px;
+right:30px;
+}
+
+/* Switch Design */
+.switch{
+position:relative;
+display:inline-block;
+width:55px;
+height:28px;
+}
+
+.switch input{
+opacity:0;
+width:0;
+height:0;
+}
+
+.slider{
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background-color:#ccc;
+transition:.4s;
+border-radius:34px;
+}
+
+.slider:before{
+position:absolute;
+content:"";
+height:22px;
+width:22px;
+left:3px;
+bottom:3px;
+background:white;
+transition:.4s;
+border-radius:50%;
+}
+
+input:checked + .slider{
+background-color:#1100ff;
+}
+
+input:checked + .slider:before{
+transform:translateX(26px);
+}/* Toggle Position */
+.theme-toggle{
+position:absolute;
+top:25px;
+right:30px;
+}
+
+/* Switch Design */
+.switch{
+position:relative;
+display:inline-block;
+width:55px;
+height:28px;
+}
+
+.switch input{
+opacity:0;
+width:0;
+height:0;
+}
+
+.slider{
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background-color:#ccc;
+transition:.4s;
+border-radius:34px;
+}
+
+.slider:before{
+position:absolute;
+content:"";
+height:22px;
+width:22px;
+left:3px;
+bottom:3px;
+background:white;
+transition:.4s;
+border-radius:50%;
+}
+
+input:checked + .slider{
+background-color:#1100ff;
+}
+
+input:checked + .slider:before{
+transform:translateX(26px);
+}
+
+/* Dark Mode Theme */
+body.dark-mode{
+background:linear-gradient(-45deg,#0f0f1a,#1a1a2e,#16213e,#0f3460);
+background-size:400% 400%;
+animation:gradientBG 10s ease infinite;
+}
+
+body.dark-mode .container{
+background:rgba(0,0,0,0.6);
+color:#ffffff;
+}
+
+body.dark-mode .upload-box{
+border:2px dashed rgba(255,255,255,0.4);
+}
+
+body.dark-mode .progress-bar{
+background:rgba(255,255,255,0.15);
+}
+
+.image-box img{
+width:100%;
+border-radius:12px;
+}
+
+</style>
 </head>
-
 <body>
 
 <div class="container">
-    <h1><i class="fa-solid fa-user-shield"></i> Deepfake Detector</h1>
-    <div class="subtitle">AI-powered image authenticity verification</div>
 
-    <form method="POST" enctype="multipart/form-data">
-        <div class="upload-box">
-            <i class="fa-solid fa-cloud-arrow-up"></i><br>
-            <input type="file" name="image" required>
-        </div>
-        <button type="submit">
-            <i class="fa-solid fa-magnifying-glass"></i> Analyze Image
-        </button>
-    </form>
+<h1>Deepfake AI Detector</h1>
 
-    {% if result %}
-    <div class="result">
-        {% if result == "Real" %}
-            <span class="badge real"><i class="fa-solid fa-circle-check"></i> REAL IMAGE</span>
-        {% else %}
-            <span class="badge fake"><i class="fa-solid fa-triangle-exclamation"></i> FAKE IMAGE</span>
-        {% endif %}
-
-        <div class="confidence">
-            <strong>Confidence:</strong> {{ confidence }}%
-        </div>
-
-        <div class="explanation">
-            <strong>Explanation:</strong> {{ explanation }}
-        </div>
-
-        <img src="{{ image_url }}" alt="Uploaded Image">
-    </div>
-    {% endif %}
-
-    <footer>
-        <i class="fa-solid fa-brain"></i> Deep Learning | CNN | ResNet18
-    </footer>
+<div class="theme-toggle">
+    <label class="switch">
+        <input type="checkbox" id="themeSwitch">
+        <span class="slider"></span>
+    </label>
 </div>
 
+<form method="POST" enctype="multipart/form-data">
+
+<div class="upload-box">
+    <input type="file" name="image" id="imageInput" required>
+</div>
+
+<br>
+
+<button type="submit">Analyze Image</button>
+
+<div class="preview" id="previewContainer" style="display:none;">
+    <img id="previewImage">
+</div>
+
+<div id="loading" style="display:none;">
+    <div class="spinner"></div>
+    <p>Analyzing with AI...</p>
+</div>
+
+</form>
+
+{% if image_url %}
+<div class="preview">
+<img src="{{ image_url }}">
+</div>
+{% endif %}
+
+
+
+{% if result %}
+<div class="result">
+Prediction:
+<span class="{{ 'fake' if result == 'Fake' else 'real' }}">
+{{ result }}
+</span>
+
+<div class="confidence">
+    Confidence: {{ confidence }}%
+</div>
+
+<div class="progress-bar">
+    <div class="progress-fill 
+        {% if result == 'Fake' %}
+            fake-bar
+        {% else %}
+            real-bar
+        {% endif %}
+    "
+    data-width="{{ confidence }}">
+    </div>
+</div>
+{% endif %}
+
+{% if explanation %}
+<div class="explanation">
+<h3>AI Analysis</h3>
+<p>
+{{ explanation }}  
+This prediction is based on learned visual patterns from deepfake datasets.  
+Facial texture consistency and lighting patterns are analyzed.  
+Subtle pixel-level anomalies are also evaluated by the neural network.  
+Higher confidence indicates stronger model certainty in the decision.
+</p>
+</div>
+{% endif %}
+
+{% if image_url and boxed_url %}
+<div class="comparison-container">
+
+<div class="image-box">
+<h3>Original Image</h3>
+<img src="{{ image_url }}">
+</div>
+
+<div class="image-box">
+<h3>Manipulation Heatmap</h3>
+<img src="{{ boxed_url }}">
+</div>
+
+</div>
+{% endif %}
+
+</div>
+<script>
+document.querySelector("form").addEventListener("submit", function() {
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("analyzeBtn").disabled = true;
+    document.getElementById("analyzeBtn").innerText = "Processing...";
+});
+</script>
+<script>
+window.addEventListener("load", function() {
+    const fill = document.querySelector(".progress-fill");
+    if(fill){
+        const width = fill.getAttribute("data-width");
+        fill.style.width = "0%";
+        setTimeout(() => {
+            fill.style.width = width + "%";
+        }, 200);
+    }
+});
+</script>
+
+<script>
+document.getElementById("imageInput").addEventListener("change", function(event){
+    const file = event.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            const preview = document.getElementById("previewImage");
+            preview.src = e.target.result;
+            document.getElementById("previewContainer").style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+
+<script>
+document.getElementById("themeSwitch").addEventListener("change", function(){
+    document.body.classList.toggle("dark-mode");
+});
+</script>
 </body>
 </html>

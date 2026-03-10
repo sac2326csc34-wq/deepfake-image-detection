@@ -1,0 +1,30 @@
+def predict_image(image_path):
+
+    image = Image.open(image_path).convert("RGB")
+    image = transform(image).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        outputs = model(image)
+        probs = F.softmax(outputs, dim=1)
+
+    confidence, predicted_class = torch.max(probs, 1)
+
+    confidence = confidence.item() * 100
+    predicted_class = predicted_class.item()
+
+    label = class_names[predicted_class].capitalize()
+
+    # ----------------------------
+    # Confidence Threshold Logic
+    # ----------------------------
+
+    if confidence < 60:
+        label = "Uncertain"
+        explanation = "The model is not confident enough to make a reliable decision."
+    elif label == "Real":
+        explanation = "No strong manipulation artifacts detected in facial regions."
+    else:
+        explanation = "Potential synthetic textures or inconsistencies detected."
+    boxed_image_path = detect_face_and_draw_box(image_path)
+    return label, round(confidence, 2), explanation, boxed_image_path
+    
